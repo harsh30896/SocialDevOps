@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: social-media-app
+    env: java
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -jar target/testApp-0.0.1-SNAPSHOT.jar
+    envVars:
+      - key: JAVA_VERSION
+        value: 21
+      - key: DATABASE_URL
+        value: jdbc:postgresql://apli13.h.filess.io:61006/SocialApp_ourluckme
+      - key: DATABASE_USERNAME
+        value: SocialApp_ourluckme
+      - key: DATABASE_PASSWORD
+        value: cc8fa453452e27ea46edae80f5f650f8077efde0
+      - key: SHOW_SQL
+        value: false
+    healthCheckPath: /login
+
