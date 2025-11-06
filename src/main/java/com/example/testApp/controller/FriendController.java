@@ -70,13 +70,20 @@ public class FriendController {
 	}
 
 	@PostMapping("/respond")
-	public String respond(@RequestParam Long requestId, @RequestParam boolean accept, HttpSession session, Model model) {
+	public String respond(@RequestParam Long requestId, @RequestParam(required = false) String accept, HttpSession session, Model model) {
 		Long userId = (Long) session.getAttribute("userId");
 		if (userId == null) return "redirect:/login";
 		
+		if (requestId == null) {
+			model.addAttribute("error", "Request ID is required");
+			return list(session, model);
+		}
+		
+		boolean acceptRequest = accept != null && (accept.equals("true") || accept.equalsIgnoreCase("true"));
+		
 		try {
 			UserAccount me = authService.findById(userId).orElseThrow();
-			friendService.respond(requestId, accept, me);
+			friendService.respond(requestId, acceptRequest, me);
 		} catch (IllegalArgumentException e) {
 			model.addAttribute("error", e.getMessage());
 			return list(session, model);

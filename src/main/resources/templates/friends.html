@@ -262,11 +262,13 @@
                     <div class="request-actions">
                         <form method="post" action="/friends/respond" style="display:inline">
                             <input type="hidden" name="requestId" th:value="${r.id}"/>
-                            <button name="accept" value="true" type="submit" class="btn-accept">✓ Accept</button>
+                            <input type="hidden" name="accept" value="true"/>
+                            <button type="submit" class="btn-accept">✓ Accept</button>
                         </form>
                         <form method="post" action="/friends/respond" style="display:inline">
                             <input type="hidden" name="requestId" th:value="${r.id}"/>
-                            <button name="accept" value="false" type="submit" class="btn-reject">✗ Reject</button>
+                            <input type="hidden" name="accept" value="false"/>
+                            <button type="submit" class="btn-reject">✗ Reject</button>
                         </form>
                     </div>
                 </li>
