@@ -34,24 +34,60 @@ public class MessageController {
 		Long userId = (Long) session.getAttribute("userId");
 		if (userId == null) return "redirect:/login";
 		UserAccount me = authService.findById(userId).orElseThrow();
+		
+		// Filter out current user from users list
+		List<UserAccount> allUsers = userRepo.findAll();
+		List<UserAccount> otherUsers = allUsers.stream()
+				.filter(u -> !u.getId().equals(me.getId()))
+				.toList();
+		
 		model.addAttribute("me", me);
-		model.addAttribute("users", userRepo.findAll());
-		if (with != null) {
-			UserAccount other = userRepo.findById(with).orElseThrow();
-			List<Message> history = messageService.conversation(me, other);
-			model.addAttribute("other", other);
-			model.addAttribute("history", history);
+		model.addAttribute("users", otherUsers);
+		
+		if (with != null && !with.equals(userId)) {
+			try {
+				UserAccount other = userRepo.findById(with)
+						.orElseThrow(() -> new IllegalArgumentException("User not found"));
+				List<Message> history = messageService.conversation(me, other);
+				model.addAttribute("other", other);
+				model.addAttribute("history", history != null ? history : java.util.Collections.emptyList());
+			} catch (Exception e) {
+				model.addAttribute("error", "Failed to load conversation: " + e.getMessage());
+			}
 		}
 		return "messages";
 	}
 
 	@PostMapping
-	public String send(@RequestParam Long toUserId, @RequestParam String content, HttpSession session) {
+	public String send(@RequestParam Long toUserId, @RequestParam String content, HttpSession session, Model model) {
 		Long userId = (Long) session.getAttribute("userId");
 		if (userId == null) return "redirect:/login";
-		UserAccount me = authService.findById(userId).orElseThrow();
-		UserAccount to = userRepo.findById(toUserId).orElseThrow();
-		messageService.send(me, to, content);
+		
+		if (content == null || content.trim().isEmpty()) {
+			model.addAttribute("error", "Message cannot be empty");
+			return convo(toUserId, session, model);
+		}
+		
+		if (content.length() > 2000) {
+			model.addAttribute("error", "Message is too long (max 2000 characters)");
+			return convo(toUserId, session, model);
+		}
+		
+		if (toUserId.equals(userId)) {
+			model.addAttribute("error", "Cannot send message to yourself");
+			return convo(null, session, model);
+		}
+		
+		try {
+			UserAccount me = authService.findById(userId).orElseThrow();
+			UserAccount to = userRepo.findById(toUserId)
+					.orElseThrow(() -> new IllegalArgumentException("User not found"));
+			messageService.send(me, to, content.trim());
+		} catch (Exception e) {
+			model.addAttribute("error", "Failed to send message: " + e.getMessage());
+			return convo(toUserId, session, model);
+		}
+		
 		return "redirect:/messages?with=" + toUserId;
 	}
 }

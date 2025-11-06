@@ -25,8 +25,35 @@ public class FriendService {
 		if (from.getId().equals(to.getId())) {
 			throw new IllegalArgumentException("Cannot friend yourself");
 		}
-		Optional<FriendRequest> existing = friendRepo.findByFromUserAndToUser(from, to);
-		if (existing.isPresent()) return existing.get();
+		
+		// Check if request already exists in either direction
+		Optional<FriendRequest> existing1 = friendRepo.findByFromUserAndToUser(from, to);
+		if (existing1.isPresent()) {
+			FriendRequest req = existing1.get();
+			if (req.getStatus() == FriendRequest.Status.ACCEPTED) {
+				throw new IllegalArgumentException("Already friends with this user");
+			}
+			if (req.getStatus() == FriendRequest.Status.PENDING) {
+				throw new IllegalArgumentException("Friend request already sent");
+			}
+			// If rejected, allow resending by updating status
+			req.setStatus(FriendRequest.Status.PENDING);
+			return friendRepo.save(req);
+		}
+		
+		// Check reverse direction
+		Optional<FriendRequest> existing2 = friendRepo.findByFromUserAndToUser(to, from);
+		if (existing2.isPresent()) {
+			FriendRequest req = existing2.get();
+			if (req.getStatus() == FriendRequest.Status.ACCEPTED) {
+				throw new IllegalArgumentException("Already friends with this user");
+			}
+			if (req.getStatus() == FriendRequest.Status.PENDING) {
+				throw new IllegalArgumentException("This user has already sent you a friend request. Please accept it instead.");
+			}
+		}
+		
+		// Create new request
 		FriendRequest fr = new FriendRequest();
 		fr.setFromUser(from);
 		fr.setToUser(to);
@@ -35,8 +62,20 @@ public class FriendService {
 	}
 
 	@Transactional
-	public FriendRequest respond(Long requestId, boolean accept) {
-		FriendRequest fr = friendRepo.findById(requestId).orElseThrow();
+	public FriendRequest respond(Long requestId, boolean accept, UserAccount currentUser) {
+		FriendRequest fr = friendRepo.findById(requestId)
+				.orElseThrow(() -> new IllegalArgumentException("Friend request not found"));
+		
+		// Validate that the request is for the current user
+		if (!fr.getToUser().getId().equals(currentUser.getId())) {
+			throw new IllegalArgumentException("You can only respond to requests sent to you");
+		}
+		
+		// Check if already responded
+		if (fr.getStatus() != FriendRequest.Status.PENDING) {
+			throw new IllegalArgumentException("This request has already been " + fr.getStatus().name().toLowerCase());
+		}
+		
 		fr.setStatus(accept ? FriendRequest.Status.ACCEPTED : FriendRequest.Status.REJECTED);
 		return friendRepo.save(fr);
 	}

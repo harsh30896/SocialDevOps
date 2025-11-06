@@ -44,11 +44,28 @@ public class HomeController {
 	}
 
 	@PostMapping("/post")
-	public String post(@RequestParam String content, HttpSession session) {
+	public String post(@RequestParam String content, HttpSession session, Model model) {
 		Long userId = (Long) session.getAttribute("userId");
 		if (userId == null) return "redirect:/login";
-		UserAccount me = authService.findById(userId).orElseThrow();
-		postService.create(me, content);
+		
+		if (content == null || content.trim().isEmpty()) {
+			model.addAttribute("error", "Post content cannot be empty");
+			return home(session, model);
+		}
+		
+		if (content.length() > 2000) {
+			model.addAttribute("error", "Post content is too long (max 2000 characters)");
+			return home(session, model);
+		}
+		
+		try {
+			UserAccount me = authService.findById(userId).orElseThrow();
+			postService.create(me, content.trim());
+		} catch (Exception e) {
+			model.addAttribute("error", "Failed to create post: " + e.getMessage());
+			return home(session, model);
+		}
+		
 		return "redirect:/";
 	}
 }

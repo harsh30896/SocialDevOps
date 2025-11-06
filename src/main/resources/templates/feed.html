@@ -224,6 +224,10 @@
     </nav>
     
     <div class="container">
+        <div class="error-message" th:if="${error}" style="background: #fee; color: #c33; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #c33;">
+            <strong>⚠️ Error:</strong> <span th:text="${error}"></span>
+        </div>
+        
         <div class="post-card post-form">
             <h3>✨ Create Post</h3>
             <form method="post" action="/post" id="postForm">
