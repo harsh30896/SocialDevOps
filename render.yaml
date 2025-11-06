@@ -8,11 +8,11 @@ services:
       - key: JAVA_VERSION
         value: 21
       - key: DATABASE_URL
-        value: jdbc:postgresql://bugwe0.h.filess.io:61006/social_keeptaxarm
+        value: jdbc:postgresql://ep-green-fire-a1zakmwx-pooler.ap-southeast-1.aws.neon.tech:5432/neondb?sslmode=require
       - key: DATABASE_USERNAME
-        value: social_keeptaxarm
+        value: neondb_owner
       - key: DATABASE_PASSWORD
-        value: 767f6876cce8411d4666b3239109607e08e1ee4d
+        value: npg_QBMC6f2nSrDP
       - key: SHOW_SQL
         value: false
     healthCheckPath: /login
