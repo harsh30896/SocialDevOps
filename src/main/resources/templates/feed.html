@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Feed</title>
+    <style>
+        body { font-family: sans-serif; max-width: 900px; margin: 2rem auto; }
+        nav { display: flex; gap: 1rem; align-items: center; }
+        form { display: grid; gap: .5rem; margin-top: 1rem; }
+        article { border: 1px solid #ddd; padding: .75rem; margin: .5rem 0; border-radius: 6px; }
+        small { color: #666; }
+    </style>
+</head>
+<body>
+<nav>
+    <div th:text="'Hello, ' + ${me.displayName}"></div>
+    <a href="/friends">Friends</a>
+    <a href="/messages">Messages</a>
+    <form method="post" action="/logout" style="margin-left:auto">
+        <button type="submit">Logout</button>
+    </form>
+</nav>
+
+<h3>Create Post</h3>
+<form method="post" action="/post">
+    <textarea name="content" rows="3" placeholder="What's happening?" required></textarea>
+    <button type="submit">Post</button>
+</form>
+
+<h3>Your Feed</h3>
+<div th:if="${#lists.isEmpty(feed)}">No posts yet.</div>
+<div th:each="p : ${feed}">
+    <article>
+        <strong th:text="${p.author.displayName}"></strong>
+        <small th:text="${#temporals.format(p.createdAt, 'yyyy-MM-dd HH:mm')}"></small>
+        <p th:text="${p.content}"></p>
+    </article>
+    </div>
+</body>
+</html>
+
+

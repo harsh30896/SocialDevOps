@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Friends</title>
+    <style>
+        body { font-family: sans-serif; max-width: 900px; margin: 2rem auto; }
+        nav { display: flex; gap: 1rem; align-items: center; }
+        section { margin-top: 1rem; }
+        ul { padding-left: 1rem; }
+        li { margin: .25rem 0; }
+    </style>
+</head>
+<body>
+<nav>
+    <a href="/">Home</a>
+    <a href="/messages">Messages</a>
+    <form method="post" action="/logout" style="margin-left:auto">
+        <button type="submit">Logout</button>
+    </form>
+</nav>
+
+<h3>Send Friend Request</h3>
+<form method="post" action="/friends/request">
+    <select name="toUserId" required>
+        <option th:each="u : ${users}" th:value="${u.id}" th:text="${u.displayName + ' (@' + u.username + ')'}"></option>
+    </select>
+    <button type="submit">Send</button>
+</form>
+
+<section>
+    <h3>Incoming Requests</h3>
+    <ul>
+        <li th:each="r : ${incoming}">
+            <span th:text="${r.fromUser.displayName}"></span>
+            <form method="post" action="/friends/respond" style="display:inline">
+                <input type="hidden" name="requestId" th:value="${r.id}"/>
+                <button name="accept" value="true">Accept</button>
+                <button name="accept" value="false">Reject</button>
+            </form>
+        </li>
+    </ul>
+</section>
+
+</body>
+</html>
+
+
