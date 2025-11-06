@@ -218,15 +218,154 @@
             font-size: 48px;
             margin-bottom: 15px;
         }
+        
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #667eea;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 15px;
+                flex-wrap: nowrap;
+                gap: 10px;
+            }
+            
+            .navbar-brand {
+                font-size: 20px;
+                flex: 1;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+                order: -1;
+            }
+            
+            .navbar-links {
+                position: fixed;
+                top: 60px;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 15px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                display: none;
+                gap: 10px;
+            }
+            
+            .navbar-links.active {
+                display: flex;
+            }
+            
+            .navbar-links a {
+                padding: 12px;
+                font-size: 15px;
+                width: 100%;
+                text-align: center;
+                border-radius: 8px;
+            }
+            
+            .logout-btn {
+                padding: 12px;
+                font-size: 15px;
+                width: 100%;
+            }
+            
+            .container {
+                padding: 0 15px;
+                margin: 15px auto;
+            }
+            
+            .card {
+                padding: 20px;
+                margin-bottom: 15px;
+            }
+            
+            .card h3 {
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+            
+            .request-form {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            select {
+                padding: 10px 14px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+            
+            .btn {
+                width: 100%;
+                padding: 12px;
+            }
+            
+            .request-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 12px;
+            }
+            
+            .request-actions {
+                width: 100%;
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .btn-accept, .btn-reject {
+                width: 100%;
+                padding: 10px;
+            }
+        }
+        
+        /* Small Mobile */
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 10px 12px;
+            }
+            
+            .navbar-brand {
+                font-size: 18px;
+            }
+            
+            .navbar-links a {
+                padding: 5px 10px;
+                font-size: 13px;
+            }
+            
+            .card {
+                padding: 15px;
+            }
+            
+            .card h3 {
+                font-size: 18px;
+            }
+        }
+        
+        /* Tablet */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .container {
+                max-width: 900px;
+            }
+        }
     </style>
 </head>
 <body>
     <nav class="navbar">
+        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
         <div class="navbar-brand">📱 Social</div>
-        <div class="navbar-links">
-            <a href="/">🏠 Home</a>
-            <a href="/messages">💬 Messages</a>
-            <form method="post" action="/logout" style="display:inline">
+        <div class="navbar-links" id="mobileMenu">
+            <a href="/" onclick="closeMobileMenu()">🏠 Home</a>
+            <a href="/messages" onclick="closeMobileMenu()">💬 Messages</a>
+            <form method="post" action="/logout" style="display:inline; width:100%;">
                 <button type="submit" class="logout-btn">Logout</button>
             </form>
         </div>
@@ -281,6 +420,25 @@
     </div>
     
     <script>
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('active');
+        }
+        
+        function closeMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.remove('active');
+        }
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('mobileMenu');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            if (!menu.contains(e.target) && !toggle.contains(e.target)) {
+                menu.classList.remove('active');
+            }
+        });
+        
         document.querySelectorAll('form[action="/friends/respond"]').forEach(form => {
             form.addEventListener('submit', function(e) {
                 const button = this.querySelector('button');

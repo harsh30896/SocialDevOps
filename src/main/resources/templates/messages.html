@@ -275,24 +275,217 @@
             margin-bottom: 20px;
         }
         
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #667eea;
+        }
+        
+        /* Mobile Responsive */
         @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 15px;
+                flex-wrap: nowrap;
+                gap: 10px;
+            }
+            
+            .navbar-brand {
+                font-size: 20px;
+                flex: 1;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+                order: -1;
+            }
+            
+            .navbar-links {
+                position: fixed;
+                top: 60px;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 15px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                display: none;
+                gap: 10px;
+            }
+            
+            .navbar-links.active {
+                display: flex;
+            }
+            
+            .navbar-links a {
+                padding: 12px;
+                font-size: 15px;
+                width: 100%;
+                text-align: center;
+                border-radius: 8px;
+            }
+            
+            .logout-btn {
+                padding: 12px;
+                font-size: 15px;
+                width: 100%;
+            }
+            
             .container {
                 grid-template-columns: 1fr;
+                padding: 0 15px;
+                margin: 15px auto;
+                gap: 15px;
             }
             
             .sidebar {
                 position: static;
+                padding: 15px;
+            }
+            
+            .sidebar h4 {
+                font-size: 18px;
+                margin-bottom: 15px;
+            }
+            
+            .user-item {
+                padding: 10px;
+            }
+            
+            .chat-container {
+                height: calc(100vh - 200px);
+                min-height: 500px;
+            }
+            
+            .chat-header {
+                padding: 15px 20px;
+            }
+            
+            .chat-header h3 {
+                font-size: 18px;
+            }
+            
+            .chat-messages {
+                padding: 15px 20px;
+            }
+            
+            .message-bubble {
+                max-width: 85%;
+            }
+            
+            .chat-input {
+                padding: 15px 20px;
+            }
+            
+            .input-form {
+                gap: 10px;
+            }
+            
+            .input-form input {
+                padding: 10px 14px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+            
+            .send-btn {
+                padding: 10px 20px;
+                font-size: 15px;
+            }
+        }
+        
+        /* Small Mobile */
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 10px 12px;
+            }
+            
+            .navbar-brand {
+                font-size: 18px;
+            }
+            
+            .navbar-links a {
+                padding: 5px 10px;
+                font-size: 13px;
+            }
+            
+            .container {
+                padding: 0 10px;
+                margin: 10px auto;
+            }
+            
+            .sidebar {
+                padding: 12px;
+            }
+            
+            .chat-container {
+                height: calc(100vh - 180px);
+                min-height: 400px;
+            }
+            
+            .chat-header {
+                padding: 12px 15px;
+            }
+            
+            .chat-header h3 {
+                font-size: 16px;
+            }
+            
+            .chat-messages {
+                padding: 12px 15px;
+            }
+            
+            .message-bubble {
+                max-width: 90%;
+                padding: 10px 14px;
+            }
+            
+            .message-content {
+                font-size: 14px;
+            }
+            
+            .chat-input {
+                padding: 12px 15px;
+            }
+            
+            .input-form input {
+                padding: 10px 12px;
+            }
+            
+            .send-btn {
+                padding: 10px 18px;
+                font-size: 14px;
+            }
+        }
+        
+        /* Tablet */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .container {
+                max-width: 1000px;
+                grid-template-columns: 250px 1fr;
+            }
+            
+            .sidebar {
+                padding: 18px;
+            }
+        }
+        
+        /* Large screens */
+        @media (min-width: 1400px) {
+            .container {
+                max-width: 1400px;
             }
         }
     </style>
 </head>
 <body>
     <nav class="navbar">
+        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
         <div class="navbar-brand">📱 Social</div>
-        <div class="navbar-links">
-            <a href="/">🏠 Home</a>
-            <a href="/friends">👥 Friends</a>
-            <form method="post" action="/logout" style="display:inline">
+        <div class="navbar-links" id="mobileMenu">
+            <a href="/" onclick="closeMobileMenu()">🏠 Home</a>
+            <a href="/friends" onclick="closeMobileMenu()">👥 Friends</a>
+            <form method="post" action="/logout" style="display:inline; width:100%;">
                 <button type="submit" class="logout-btn">Logout</button>
             </form>
         </div>
@@ -348,22 +541,168 @@
         </main>
     </div>
     
+    <!-- SockJS and STOMP for WebSocket -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7/bundles/stomp.umd.min.js"></script>
+    
     <script>
-        // Auto-scroll to bottom
-        const messagesContainer = document.getElementById('messagesContainer');
-        if (messagesContainer) {
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('active');
         }
         
-        // Form submission
+        function closeMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.remove('active');
+        }
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('mobileMenu');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            if (menu && toggle && !menu.contains(e.target) && !toggle.contains(e.target)) {
+                menu.classList.remove('active');
+            }
+        });
+    </script>
+    
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const currentUserId = /*[[${me.id}]]*/ null;
+        const currentUserName = /*[[${me.displayName}]]*/ '';
+        const recipientId = /*[[${other?.id}]]*/ null;
+        const recipientName = /*[[${other?.displayName}]]*/ '';
+        /*]]>*/
+        
+        let stompClient = null;
+        const messagesContainer = document.getElementById('messagesContainer');
         const messageForm = document.getElementById('messageForm');
-        if (messageForm) {
+        
+        // Connect to WebSocket
+        function connect() {
+            if (!currentUserId) return;
+            
+            const socket = new SockJS('/ws');
+            stompClient = new StompJs.Client({
+                webSocketFactory: () => socket,
+                debug: function(str) {
+                    console.log(str);
+                },
+                reconnectDelay: 5000,
+                heartbeatIncoming: 4000,
+                heartbeatOutgoing: 4000,
+            });
+            
+            stompClient.onConnect = function(frame) {
+                console.log('Connected: ' + frame);
+                
+                // Subscribe to personal message topic
+                if (currentUserId) {
+                    stompClient.subscribe('/topic/user/' + currentUserId, function(message) {
+                        const chatMessage = JSON.parse(message.body);
+                        displayMessage(chatMessage);
+                    });
+                }
+            };
+            
+            stompClient.onStompError = function(frame) {
+                console.error('Broker reported error: ' + frame.headers['message']);
+                console.error('Additional details: ' + frame.body);
+            };
+            
+            stompClient.activate();
+        }
+        
+        // Display message in chat
+        function displayMessage(chatMessage) {
+            if (!messagesContainer || !recipientId) return;
+            
+            // Only show if message is for current conversation
+            if (chatMessage.recipientId !== recipientId && chatMessage.senderId !== recipientId) {
+                return;
+            }
+            
+            const isMine = chatMessage.senderId === currentUserId;
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message ' + (isMine ? 'mine' : 'other');
+            
+            const time = new Date(chatMessage.timestamp).toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            
+            messageDiv.innerHTML = `
+                <div class="message-bubble">
+                    ${!isMine ? `<div class="message-author">${escapeHtml(chatMessage.senderName)}</div>` : ''}
+                    <div class="message-content">${escapeHtml(chatMessage.content)}</div>
+                    <div class="message-info">${time}</div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+        
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Scroll to bottom
+        function scrollToBottom() {
+            if (messagesContainer) {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        }
+        
+        // Send message via WebSocket
+        function sendMessage(content) {
+            if (!stompClient || !stompClient.connected || !recipientId) {
+                // Fallback to form submission if WebSocket not connected
+                return false;
+            }
+            
+            const chatMessage = {
+                senderId: currentUserId,
+                senderName: currentUserName,
+                recipientId: recipientId,
+                content: content.trim(),
+                type: 'MESSAGE'
+            };
+            
+            stompClient.publish({
+                destination: '/app/chat.send',
+                body: JSON.stringify(chatMessage)
+            });
+            
+            return true;
+        }
+        
+        // Initialize
+        if (messageForm && recipientId) {
             messageForm.addEventListener('submit', function(e) {
+                e.preventDefault();
                 const input = this.querySelector('input[name="content"]');
                 const button = this.querySelector('button');
-                if (input.value.trim()) {
-                    button.textContent = 'Sending...';
-                    button.disabled = true;
+                const content = input.value.trim();
+                
+                if (!content) return;
+                
+                if (content.length > 2000) {
+                    alert('Message is too long (max 2000 characters)');
+                    return;
+                }
+                
+                // Try WebSocket first, fallback to form
+                if (sendMessage(content)) {
+                    input.value = '';
+                    button.textContent = 'Send';
+                    button.disabled = false;
+                } else {
+                    // Fallback: submit form normally
+                    this.submit();
                 }
             });
             
@@ -376,6 +715,21 @@
                 }
             });
         }
+        
+        // Connect when page loads
+        if (currentUserId) {
+            connect();
+        }
+        
+        // Initial scroll
+        scrollToBottom();
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (stompClient) {
+                stompClient.deactivate();
+            }
+        });
     </script>
 </body>
 </html>

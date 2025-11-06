@@ -140,6 +140,44 @@
             color: #f093fb;
             text-decoration: underline;
         }
+        
+        /* Mobile Responsive */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 25px 20px;
+                border-radius: 16px;
+            }
+            
+            .logo h1 {
+                font-size: 28px;
+            }
+            
+            .logo p {
+                font-size: 13px;
+            }
+            
+            input {
+                padding: 12px 14px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+            
+            button {
+                padding: 12px;
+                font-size: 16px;
+            }
+        }
+        
+        /* Tablet */
+        @media (min-width: 481px) and (max-width: 768px) {
+            .container {
+                max-width: 500px;
+                padding: 35px;
+            }
+        }
     </style>
 </head>
 <body>
