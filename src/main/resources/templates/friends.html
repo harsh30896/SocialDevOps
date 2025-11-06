@@ -2,47 +2,292 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <title>Friends</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Friends - Social Media</title>
     <style>
-        body { font-family: sans-serif; max-width: 900px; margin: 2rem auto; }
-        nav { display: flex; gap: 1rem; align-items: center; }
-        section { margin-top: 1rem; }
-        ul { padding-left: 1rem; }
-        li { margin: .25rem 0; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .navbar-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .navbar-links a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .navbar-links a:hover {
+            background: #f0f2f5;
+        }
+        
+        .logout-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card h3 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 22px;
+        }
+        
+        .request-form {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+        
+        select {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            background: #f8f9fa;
+            transition: all 0.3s;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .request-list {
+            list-style: none;
+        }
+        
+        .request-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+        
+        .request-item:hover {
+            background: #f0f2f5;
+            transform: translateX(5px);
+        }
+        
+        .request-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .request-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .request-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-accept {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-accept:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(17, 153, 142, 0.4);
+        }
+        
+        .btn-reject {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-reject:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
-<nav>
-    <a href="/">Home</a>
-    <a href="/messages">Messages</a>
-    <form method="post" action="/logout" style="margin-left:auto">
-        <button type="submit">Logout</button>
-    </form>
-</nav>
-
-<h3>Send Friend Request</h3>
-<form method="post" action="/friends/request">
-    <select name="toUserId" required>
-        <option th:each="u : ${users}" th:value="${u.id}" th:text="${u.displayName + ' (@' + u.username + ')'}"></option>
-    </select>
-    <button type="submit">Send</button>
-</form>
-
-<section>
-    <h3>Incoming Requests</h3>
-    <ul>
-        <li th:each="r : ${incoming}">
-            <span th:text="${r.fromUser.displayName}"></span>
-            <form method="post" action="/friends/respond" style="display:inline">
-                <input type="hidden" name="requestId" th:value="${r.id}"/>
-                <button name="accept" value="true">Accept</button>
-                <button name="accept" value="false">Reject</button>
+    <nav class="navbar">
+        <div class="navbar-brand">📱 Social</div>
+        <div class="navbar-links">
+            <a href="/">🏠 Home</a>
+            <a href="/messages">💬 Messages</a>
+            <form method="post" action="/logout" style="display:inline">
+                <button type="submit" class="logout-btn">Logout</button>
             </form>
-        </li>
-    </ul>
-</section>
-
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="card">
+            <h3>👥 Send Friend Request</h3>
+            <form method="post" action="/friends/request" class="request-form">
+                <select name="toUserId" required>
+                    <option value="">Select a user...</option>
+                    <option th:each="u : ${users}" 
+                            th:value="${u.id}" 
+                            th:text="${u.displayName + ' (@' + u.username + ')'}"
+                            th:disabled="${u.id == me.id}"></option>
+                </select>
+                <button type="submit" class="btn">Send Request</button>
+            </form>
+        </div>
+        
+        <div class="card">
+            <h3>📬 Incoming Friend Requests</h3>
+            <ul class="request-list" th:if="${!#lists.isEmpty(incoming)}">
+                <li th:each="r : ${incoming}" class="request-item">
+                    <div class="request-info">
+                        <span class="request-name" th:text="${r.fromUser.displayName}"></span>
+                        <span style="color: #999; font-size: 14px;" th:text="'@' + ${r.fromUser.username}"></span>
+                    </div>
+                    <div class="request-actions">
+                        <form method="post" action="/friends/respond" style="display:inline">
+                            <input type="hidden" name="requestId" th:value="${r.id}"/>
+                            <button name="accept" value="true" type="submit" class="btn-accept">✓ Accept</button>
+                        </form>
+                        <form method="post" action="/friends/respond" style="display:inline">
+                            <input type="hidden" name="requestId" th:value="${r.id}"/>
+                            <button name="accept" value="false" type="submit" class="btn-reject">✗ Reject</button>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+            <div th:if="${#lists.isEmpty(incoming)}" class="empty-state">
+                <div class="empty-state-icon">📭</div>
+                <p>No pending friend requests</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.querySelectorAll('form[action="/friends/respond"]').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const button = this.querySelector('button');
+                const originalText = button.textContent;
+                button.textContent = 'Processing...';
+                button.disabled = true;
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.disabled = false;
+                }, 2000);
+            });
+        });
+    </script>
 </body>
 </html>
-
-

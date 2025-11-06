@@ -8,11 +8,11 @@ services:
       - key: JAVA_VERSION
         value: 21
       - key: DATABASE_URL
-        value: jdbc:postgresql://apli13.h.filess.io:61006/SocialApp_ourluckme
+        value: jdbc:postgresql://bugwe0.h.filess.io:61006/social_keeptaxarm
       - key: DATABASE_USERNAME
-        value: SocialApp_ourluckme
+        value: social_keeptaxarm
       - key: DATABASE_PASSWORD
-        value: cc8fa453452e27ea46edae80f5f650f8077efde0
+        value: 767f6876cce8411d4666b3239109607e08e1ee4d
       - key: SHOW_SQL
         value: false
     healthCheckPath: /login

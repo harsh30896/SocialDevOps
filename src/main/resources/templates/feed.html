@@ -2,41 +2,267 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <title>Feed</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Feed - Social Media</title>
     <style>
-        body { font-family: sans-serif; max-width: 900px; margin: 2rem auto; }
-        nav { display: flex; gap: 1rem; align-items: center; }
-        form { display: grid; gap: .5rem; margin-top: 1rem; }
-        article { border: 1px solid #ddd; padding: .75rem; margin: .5rem 0; border-radius: 6px; }
-        small { color: #666; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .navbar-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .navbar-links a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .navbar-links a:hover {
+            background: #f0f2f5;
+        }
+        
+        .user-info {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .logout-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .post-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .post-form {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .post-form h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 20px;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .post-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .post-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .feed-header {
+            margin-bottom: 20px;
+        }
+        
+        .feed-header h2 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .post-item {
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .post-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .post-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        
+        .post-author {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .post-time {
+            color: #999;
+            font-size: 13px;
+        }
+        
+        .post-content {
+            color: #555;
+            line-height: 1.6;
+            font-size: 15px;
+            margin-top: 10px;
+        }
+        
+        .empty-feed {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-feed-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
-<nav>
-    <div th:text="'Hello, ' + ${me.displayName}"></div>
-    <a href="/friends">Friends</a>
-    <a href="/messages">Messages</a>
-    <form method="post" action="/logout" style="margin-left:auto">
-        <button type="submit">Logout</button>
-    </form>
-</nav>
-
-<h3>Create Post</h3>
-<form method="post" action="/post">
-    <textarea name="content" rows="3" placeholder="What's happening?" required></textarea>
-    <button type="submit">Post</button>
-</form>
-
-<h3>Your Feed</h3>
-<div th:if="${#lists.isEmpty(feed)}">No posts yet.</div>
-<div th:each="p : ${feed}">
-    <article>
-        <strong th:text="${p.author.displayName}"></strong>
-        <small th:text="${#temporals.format(p.createdAt, 'yyyy-MM-dd HH:mm')}"></small>
-        <p th:text="${p.content}"></p>
-    </article>
+    <nav class="navbar">
+        <div class="navbar-brand">📱 Social</div>
+        <div class="navbar-links">
+            <span class="user-info" th:text="'👤 ' + ${me.displayName}"></span>
+            <a href="/">🏠 Home</a>
+            <a href="/friends">👥 Friends</a>
+            <a href="/messages">💬 Messages</a>
+            <form method="post" action="/logout" style="display:inline">
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="post-card post-form">
+            <h3>✨ Create Post</h3>
+            <form method="post" action="/post" id="postForm">
+                <textarea name="content" rows="4" placeholder="What's on your mind?" required></textarea>
+                <button type="submit" class="post-btn">Post</button>
+            </form>
+        </div>
+        
+        <div class="feed-header">
+            <h2>📰 Your Feed</h2>
+        </div>
+        
+        <div th:if="${#lists.isEmpty(feed)}" class="post-card empty-feed">
+            <div class="empty-feed-icon">📭</div>
+            <p>No posts yet. Start by creating your first post!</p>
+        </div>
+        
+        <div th:each="p : ${feed}" class="post-card post-item">
+            <div class="post-header">
+                <span class="post-author" th:text="${p.author.displayName}"></span>
+                <span class="post-time" th:text="${#temporals.format(p.createdAt, 'MMM dd, yyyy • HH:mm')}"></span>
+            </div>
+            <div class="post-content" th:text="${p.content}"></div>
+        </div>
     </div>
+    
+    <script>
+        document.getElementById('postForm').addEventListener('submit', function(e) {
+            const button = this.querySelector('button');
+            button.textContent = 'Posting...';
+            button.disabled = true;
+        });
+        
+        // Auto-resize textarea
+        const textarea = document.querySelector('textarea');
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+    </script>
 </body>
 </html>
-
-
